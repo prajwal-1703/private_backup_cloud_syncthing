@@ -15,5 +15,5 @@ data/
 #This directory is mapped form the container to the host machine. In order to persist the data files sync'd from other devices.
 
 
-
+#Ignore the following line it is specific to my setup
 data/LOQ/dapp-world/CrossBorderTrade/
