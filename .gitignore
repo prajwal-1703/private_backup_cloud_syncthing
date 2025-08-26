@@ -1,0 +1,19 @@
+#igoring the config directory 
+
+config/
+
+#This Directory contains sensitive information and should not be tracked by version control.
+#It may include the Private key and other sensitive information.
+#This directory is mapped form the container to the host machine. In order to persist the configuration files.
+
+
+#Ignoring the data directory
+data/
+
+#This directory contains the data sync'd from the container to the host machine.
+# For example we set this up to backup our media files from our mobile to the host machine.
+#This directory is mapped form the container to the host machine. In order to persist the data files sync'd from other devices.
+
+
+
+data/LOQ/dapp-world/CrossBorderTrade/
