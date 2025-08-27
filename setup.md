@@ -150,7 +150,4 @@ docker logs syncthing
 
 ```
 
----
 
-Would you also like me to merge both `README.md` + `SETUP.md` into **one big README** (with a setup section inside) so that your GitHub repo has only one polished documentation file?
-```
