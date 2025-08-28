@@ -1,7 +1,4 @@
-Got it ✅
-Here’s the **complete setup file (`SETUP.md`)** in one clean copy-paste format, no breaks:
 
-````markdown
 # 🚀 Setup Guide: Personal Backup Cloud with Docker + Tailscale
 
 This guide will help you set up your **private backup cloud** using **Docker, Tailscale, and Syncthing**.  
