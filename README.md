@@ -1,42 +1,70 @@
 # Personal Backup Cloud using Docker + Tailscale
 
-This project provides a **self-hosted backup solution** that uses **Docker** and **Tailscale** to create a secure, private cloud for continuous and automatic backup of your personal data.
+A **self-hosted private backup cloud** built using **Docker**, **Syncthing**, and **Tailscale**.  
+This project enables secure, continuous, and automatic backup of personal data across devices without relying on third-party cloud services.
 
-With **Tailscale**, you create a private VPN (Virtual Private Network) that allows secure communication between your devices, even if they are behind NAT or firewalls.  
-With **Syncthing** (running in Docker), you can sync data across multiple devices in this private network.
+---
+
+## 📌 Project Options
+
+You can deploy this project in two modes:
+
+1. **Option 1 (Basic)** – Syncthing only (background file sync)
+2. **Option 2 (Advanced)** – Syncthing + Web Dashboard (File Browser)
 
 ---
 
 ## ✨ Features
-- 🔐 **Private VPN** using Tailscale (free plan supports up to **100 devices** and **3 users**).
-- 💾 **Continuous & automatic data backup** with Syncthing.
-- 🖥️ Use any device (Raspberry Pi, old laptop, server) as your backup server.
-- 📱 Multi-device support (Android, Linux, Windows, macOS, etc.).
-- ⚡ Easy setup using **Docker Compose**.
-- 🌍 Access your backup devices anywhere through Tailscale’s CGNAT IP.
+
+- 🔐 Private VPN using **Tailscale** (Free tier: 100 devices, 3 users)
+- 💾 Continuous & automatic file backups using **Syncthing**
+- 🖥️ Works on laptops, servers, Raspberry Pi, old hardware
+- 📱 Cross-platform (Linux, Windows, macOS, Android)
+- ⚡ Simple deployment using **Docker Compose**
+- 🌍 Secure access via **Tailscale CGNAT IP**
+- 🚫 No public ports or port-forwarding required
+
+### 🚀 Advanced Features (Option 2)
+
+- 📂 Web-based file dashboard
+- 🖼️ Image & video preview
+- 🛠️ File management (rename, move, delete)
+- 🔐 Browser access without SSH
 
 ---
 
-## 🏗️ Architecture
-1. **Tailscale Network**  
-   - Devices join a shared private network.
-   - Each device gets a unique **CGNAT IP**.
-   - One device is chosen as the **server** (recommended: a laptop or Raspberry Pi with decent storage, e.g., 8GB RAM + 1TB HDD/SSD).
+## 🏗️ Architecture Overview
 
-2. **Docker + Syncthing on Server**  
-   - Runs inside Docker container.
-   - Exposes Syncthing UI (port **8384**) and sync ports (**22000**, **21027**).
+### 1️⃣ Tailscale Network
+- All devices join a private VPN
+- Each device receives a CGNAT IP
+- One device acts as the backup server
 
-3. **Client Devices**  
-   - Join the same Tailscale network.
-   - Install **Syncthing client app** (e.g., Syncthing-Fork on Android).
-   - Connect to server’s Tailscale IP and select folders to sync.
+### 2️⃣ Containers
+- **Syncthing** → Handles synchronization
+- **File Browser** → Provides web UI (Advanced only)
+- Both containers share the same `/data` directory
+
+Client Devices
+│
+▼
+Tailscale VPN
+│
+▼
+Backup Server
+├── Syncthing
+└── File Browser (Optional)
+
+yaml
+Copy code
 
 ---
 
-## 🐳 Docker Compose Configuration
+## 📦 Option 1: Basic Setup (Syncthing Only)
 
-Below is the **docker-compose.yaml** file used for Syncthing:
+Use this setup if you only need background syncing.
+
+### 📄 docker-compose.yml
 
 ```yaml
 services:
@@ -44,15 +72,167 @@ services:
     image: lscr.io/linuxserver/syncthing:latest
     container_name: syncthing
     environment:
-      - PUID=1000       # user ID (adjust if needed)
-      - PGID=1000       # group ID (adjust if needed)
-      - TZ=Asia/Kolkata # timezone
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
     volumes:
-      - ./config:/config  # persistent Syncthing configuration
-      - ./data:/data      # folder where synced data is stored
+      - ./config:/config
+      - ./data:/data
     ports:
-      - 8384:8384        # Syncthing Web UI
-      - 22000:22000/tcp  # TCP sync port
-      - 22000:22000/udp  # UDP sync port
-      - 21027:21027/udp  # Local discovery
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
     restart: always
+▶️ Start the service
+bash
+Copy code
+docker-compose up -d
+🌐 Access Syncthing UI
+cpp
+Copy code
+http://<SERVER-IP>:8384
+🚀 Option 2: Advanced Setup (Syncthing + Dashboard)
+This setup provides a Google Drive–like interface for your private cloud.
+
+⚠️ Pre-Requisites (Mandatory)
+Before starting containers, initialize File Browser configuration:
+
+bash
+Copy code
+mkdir -p fb_config
+touch fb_config/settings.json
+touch fb_config/filebrowser.db
+echo "{}" > fb_config/settings.json
+📄 docker-compose.yml (Advanced)
+yaml
+Copy code
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    restart: always
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    user: 1000:1000
+    command: >
+      -d /database/filebrowser.db
+      -c /config/settings.json
+      -a 0.0.0.0
+      -p 80
+      -r /srv
+    ports:
+      - 8080:80
+    volumes:
+      - ./data:/srv
+      - ./fb_config/filebrowser.db:/database/filebrowser.db
+      - ./fb_config/settings.json:/config/settings.json
+    restart: always
+▶️ Run the Project
+bash
+Copy code
+docker-compose up -d
+🌍 Accessing the Web Dashboard
+Connect your device to Tailscale
+
+Open a browser and visit:
+
+cpp
+Copy code
+http://<SERVER-TAILSCALE-IP>:8080
+🔑 Default Login
+pgsql
+Copy code
+Username: admin
+Password: admin
+⚠️ Change the password immediately after login.
+
+🔐 Security Notes
+End-to-end encrypted traffic via Tailscale
+
+No public IP exposure
+
+Proper file ownership using PUID/PGID
+
+Ideal for zero-trust home lab setups
+
+🧠 Use Cases
+Personal backup cloud
+
+Secure device-to-device sync
+
+Home lab storage
+
+Privacy-first cloud alternative
+
+DevOps / Self-hosting portfolio project
+
+🧰 Tech Stack
+Docker
+
+Docker Compose
+
+Syncthing
+
+File Browser
+
+Tailscale
+
+Linux
+
+📁 Recommended Directory Structure
+powershell
+Copy code
+backup-cloud/
+├── docker-compose.yml
+├── config/
+├── data/
+├── fb_config/
+│   ├── settings.json
+│   └── filebrowser.db
+└── README.md
+📄 License
+MIT License
+
+🤝 Contributing
+Contributions, improvements, and suggestions are welcome.
+Fork the repo and submit a pull request.
+
+⭐ Final Note
+This project is resume-ready, DevOps-oriented, and ideal for showcasing:
+
+Self-hosting
+
+Secure networking
+
+Containerization
+
+Zero-trust architecture
+
+yaml
+Copy code
+
+---
+
+If you want next:
+- 🧾 **Git commit messages**
+- 📊 **Mermaid architecture diagram**
+- 🧠 **Interview explanation script**
+- 🧑‍💼 **Resume project description**
+
+Just tell me 💪
