@@ -45,6 +45,7 @@ You can deploy this project in two modes:
 - **File Browser** → Provides web UI (Advanced only)
 - Both containers share the same `/data` directory
 
+```
 Client Devices
 │
 ▼
@@ -54,9 +55,7 @@ Tailscale VPN
 Backup Server
 ├── Syncthing
 └── File Browser (Optional)
-
-yaml
-Copy code
+```
 
 ---
 
@@ -84,29 +83,40 @@ services:
       - 22000:22000/udp
       - 21027:21027/udp
     restart: always
+```
+
 ▶️ Start the service
-bash
-Copy code
+
+```bash
 docker-compose up -d
+```
+
 🌐 Access Syncthing UI
-cpp
-Copy code
+
+```
 http://<SERVER-IP>:8384
-🚀 Option 2: Advanced Setup (Syncthing + Dashboard)
+```
+
+---
+
+## 🚀 Option 2: Advanced Setup (Syncthing + Dashboard)
+
 This setup provides a Google Drive–like interface for your private cloud.
 
-⚠️ Pre-Requisites (Mandatory)
+### ⚠️ Pre-Requisites (Mandatory)
+
 Before starting containers, initialize File Browser configuration:
 
-bash
-Copy code
+```bash
 mkdir -p fb_config
 touch fb_config/settings.json
 touch fb_config/filebrowser.db
 echo "{}" > fb_config/settings.json
-📄 docker-compose.yml (Advanced)
-yaml
-Copy code
+```
+
+### 📄 docker-compose.yml (Advanced)
+
+```yaml
 services:
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
@@ -143,61 +153,68 @@ services:
       - ./fb_config/filebrowser.db:/database/filebrowser.db
       - ./fb_config/settings.json:/config/settings.json
     restart: always
+```
+
 ▶️ Run the Project
-bash
-Copy code
+
+```bash
 docker-compose up -d
-🌍 Accessing the Web Dashboard
+```
+
+### 🌍 Accessing the Web Dashboard
+
 Connect your device to Tailscale
 
 Open a browser and visit:
 
-cpp
-Copy code
+```
 http://<SERVER-TAILSCALE-IP>:8080
-🔑 Default Login
-pgsql
-Copy code
+```
+
+### 🔑 Default Login
+
+```
 Username: admin
 Password: admin
+```
+
 ⚠️ Change the password immediately after login.
 
-🔐 Security Notes
-End-to-end encrypted traffic via Tailscale
+---
 
-No public IP exposure
+## 🔐 Security Notes
 
-Proper file ownership using PUID/PGID
+- End-to-end encrypted traffic via Tailscale
+- No public IP exposure
+- Proper file ownership using PUID/PGID
+- Ideal for zero-trust home lab setups
 
-Ideal for zero-trust home lab setups
+---
 
-🧠 Use Cases
-Personal backup cloud
+## 🧠 Use Cases
 
-Secure device-to-device sync
+- Personal backup cloud
+- Secure device-to-device sync
+- Home lab storage
+- Privacy-first cloud alternative
+- DevOps / Self-hosting portfolio project
 
-Home lab storage
+---
 
-Privacy-first cloud alternative
+## 🧰 Tech Stack
 
-DevOps / Self-hosting portfolio project
+- Docker
+- Docker Compose
+- Syncthing
+- File Browser
+- Tailscale
+- Linux
 
-🧰 Tech Stack
-Docker
+---
 
-Docker Compose
+## 📁 Recommended Directory Structure
 
-Syncthing
-
-File Browser
-
-Tailscale
-
-Linux
-
-📁 Recommended Directory Structure
-powershell
-Copy code
+```bash
 backup-cloud/
 ├── docker-compose.yml
 ├── config/
@@ -206,26 +223,31 @@ backup-cloud/
 │   ├── settings.json
 │   └── filebrowser.db
 └── README.md
-📄 License
+```
+
+---
+
+## 📄 License
+
 MIT License
 
-🤝 Contributing
-Contributions, improvements, and suggestions are welcome.
+---
+
+## 🤝 Contributing
+
+Contributions, improvements, and suggestions are welcome.  
 Fork the repo and submit a pull request.
 
-⭐ Final Note
+---
+
+## ⭐ Final Note
+
 This project is resume-ready, DevOps-oriented, and ideal for showcasing:
 
-Self-hosting
-
-Secure networking
-
-Containerization
-
-Zero-trust architecture
-
-yaml
-Copy code
+- Self-hosting
+- Secure networking
+- Containerization
+- Zero-trust architecture
 
 ---
 
